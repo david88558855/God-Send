@@ -1,6 +1,4 @@
-//go:build android
-
-package main
+package godsend
 
 import (
 	"fmt"
@@ -11,6 +9,14 @@ import (
 	"github.com/God-Send/God-Send/internal/server"
 	"github.com/God-Send/God-Send/internal/transfer"
 )
+
+// DeviceInfo 设备信息(导出给Android调用)
+type DeviceInfo struct {
+	DeviceName string
+	DeviceID   string
+	Port       int
+	Platform   string
+}
 
 // GodSendApp Android绑定应用
 type GodSendApp struct {
@@ -92,26 +98,14 @@ func (a *GodSendApp) GetServerURL() string {
 }
 
 // GetDeviceInfo 获取设备信息(导出给Android调用)
-func (a *GodSendApp) GetDeviceInfo() map[string]interface{} {
+func (a *GodSendApp) GetDeviceInfo() *DeviceInfo {
 	if a.config == nil {
 		return nil
 	}
-	return map[string]interface{}{
-		"device_name": a.config.DeviceName,
-		"device_id":   a.discovery.GetDeviceID(),
-		"port":        a.config.Port,
-		"platform":    "android",
+	return &DeviceInfo{
+		DeviceName: a.config.DeviceName,
+		DeviceID:   a.discovery.GetDeviceID(),
+		Port:       a.config.Port,
+		Platform:   "android",
 	}
-}
-
-func main() {
-	// Android入口由gomobile绑定管理
-	// 此main函数仅用于编译检查
-	app := NewGodSendApp()
-	if err := app.Start(); err != nil {
-		log.Fatal(err)
-	}
-
-	// 阻塞等待
-	select {}
 }

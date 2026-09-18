@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>God-Send</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===== Material 3 Expressive Design Tokens (Light) ===== */
+:root {
+  --md-source: #6750A4;
+  --md-primary: #6750A4;
+  --md-on-primary: #FFFFFF;
+  --md-primary-container: #EADDFF;
+  --md-on-primary-container: #21005D;
+  --md-secondary: #625B71;
+  --md-on-secondary: #FFFFFF;
+  --md-secondary-container: #E8DEF8;
+  --md-on-secondary-container: #1D192B;
+  --md-tertiary: #7D5260;
+  --md-on-tertiary: #FFFFFF;
+  --md-tertiary-container: #FFD8E4;
+  --md-on-tertiary-container: #31111D;
+  --md-error: #B3261E;
+  --md-on-error: #FFFFFF;
+  --md-error-container: #F9DEDC;
+  --md-on-error-container: #410E0B;
+  --md-surface: #F5F5F5;
+  --md-on-surface: #1C1C1C;
+  --md-on-surface-variant: #5A5A5A;
+  --md-surface-container-lowest: #FFFFFF;
+  --md-surface-container-low: #FAFAFA;
+  --md-surface-container: #F0F0F0;
+  --md-surface-container-high: #E8E8E8;
+  --md-surface-container-highest: #DADADA;
+  --md-outline: #7A7A7A;
+  --md-outline-variant: #C8C8C8;
+  --md-inverse-surface: #303030;
+  --md-inverse-on-surface: #F0F0F0;
+  --md-inverse-primary: #D0BCFF;
+  --md-scrim: #000000;
+  --md-shadow: #1C1C1C;
+  /* Expressive tokens */
+  --md-shape-corner-extra-large: 28px;
+  --md-shape-corner-large: 16px;
+  --md-shape-corner-medium: 12px;
+  --md-shape-corner-small: 8px;
+  --md-shape-corner-full: 9999px;
+  --md-elevation-1: 0 1px 3px 1px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.3);
+  --md-elevation-2: 0 2px 6px 2px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.3);
+  --md-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.3);
+  --md-motion-duration-medium: 400ms;
+  --md-motion-duration-short: 200ms;
+  --md-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.material-symbols-rounded {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* ===== Layout ===== */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ===== Navigation Rail (Left) ===== */
+.nav-rail {
+  width: 80px;
+  background: var(--md-surface-container-low);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0 12px;
+  gap: 4px;
+  z-index: 10;
+  border-right: 1px solid var(--md-outline-variant);
+}
+
+.nav-rail-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--md-shape-corner-extra-large);
+  background: var(--md-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+.nav-rail-logo:hover { transform: scale(1.08); }
+.nav-rail-logo .material-symbols-rounded {
+  color: var(--md-on-primary-container);
+  font-size: 28px;
+}
+
+.nav-rail-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--md-shape-corner-large);
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: var(--md-elevation-1);
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+.nav-rail-fab:hover {
+  box-shadow: var(--md-elevation-2);
+  transform: scale(1.05);
+}
+.nav-rail-fab .material-symbols-rounded { font-size: 24px; }
+
+.nav-rail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  cursor: pointer;
+  width: 100%;
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+
+.nav-rail-item-icon {
+  width: 56px;
+  height: 32px;
+  border-radius: var(--md-shape-corner-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all var(--md-motion-duration-medium) var(--md-motion-easing-emphasized);
+}
+.nav-rail-item:hover .nav-rail-item-icon {
+  background: rgba(0, 0, 0, 0.05);
+}
+.nav-rail-item.active .nav-rail-item-icon {
+  background: var(--md-secondary-container);
+}
+.nav-rail-item.active .nav-rail-item-icon .material-symbols-rounded {
+  color: var(--md-on-secondary-container);
+}
+.nav-rail-item .material-symbols-rounded {
+  color: var(--md-on-surface-variant);
+  transition: color var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+.nav-rail-item.active .material-symbols-rounded {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.nav-rail-item-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--md-on-surface);
+  letter-spacing: 0.5px;
+}
+
+.nav-rail-spacer { flex: 1; }
+
+/* Badge */
+.nav-badge {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: var(--md-shape-corner-full);
+  background: var(--md-error);
+  color: var(--md-on-error);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* ===== Side Panel ===== */
+.side-panel {
+  width: 320px;
+  background: var(--md-surface-container-low);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--md-outline-variant);
+  transition: width var(--md-motion-duration-medium) var(--md-motion-easing-emphasized);
+}
+.side-panel.collapsed { width: 0; overflow: hidden; border: none; }
+
+.side-panel-header {
+  padding: 24px 24px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.side-panel-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--md-on-surface);
+  letter-spacing: -0.5px;
+}
+
+.side-panel-search {
+  margin: 0 16px 12px;
+  position: relative;
+}
+.side-panel-search input {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--md-shape-corner-extra-large);
+  background: var(--md-surface-container-high);
+  border: none;
+  padding: 0 16px 0 48px;
+  font-size: 14px;
+  color: var(--md-on-surface);
+  outline: none;
+  font-family: inherit;
+  transition: background var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+.side-panel-search input::placeholder { color: var(--md-on-surface-variant); }
+.side-panel-search input:focus { background: var(--md-surface-container-highest); }
+.side-panel-search .material-symbols-rounded {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--md-on-surface-variant);
+  font-size: 20px;
+}
+
+.side-panel-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px;
+}
+
+/* Device Card */
+.device-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--md-shape-corner-large);
+  cursor: pointer;
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+  margin-bottom: 4px;
+}
+.device-card:hover { background: rgba(0, 0, 0, 0.05); }
+.device-card.active { background: var(--md-secondary-container); }
+
+.device-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--md-shape-corner-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--md-on-primary-container);
+  flex-shrink: 0;
+  position: relative;
+}
+.device-avatar .online-dot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4CAF50;
+  border: 2px solid var(--md-surface-container-low);
+}
+
+.device-info { flex: 1; min-width: 0; }
+.device-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--md-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.device-status {
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+  margin-top: 2px;
+}
+
+/* ===== Main Content ===== */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--md-surface);
+  min-width: 0;
+}
+
+.main-header {
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--md-outline-variant);
+  background: var(--md-surface);
+  flex-shrink: 0;
+}
+.main-header-title {
+  font-size: 18px;
+  font-weight: 500;
+  flex: 1;
+}
+.main-header-actions { display: flex; gap: 4px; }
+
+/* Icon Button */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--md-shape-corner-full);
+  border: none;
+  background: transparent;
+  color: var(--md-on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+  position: relative;
+}
+.icon-btn:hover { background: rgba(0, 0, 0, 0.06); }
+.icon-btn .material-symbols-rounded { font-size: 24px; }
+
+/* ===== Chat Area ===== */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Message Bubble */
+.message-bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: var(--md-shape-corner-extra-large);
+  font-size: 14px;
+  line-height: 1.5;
+  animation: messageIn var(--md-motion-duration-medium) var(--md-motion-easing-emphasized);
+  position: relative;
+}
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.message-bubble.sent {
+  align-self: flex-end;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  border-bottom-right-radius: var(--md-shape-corner-small);
+}
+.message-bubble.received {
+  align-self: flex-start;
+  background: var(--md-surface-container-high);
+  color: var(--md-on-surface);
+  border-bottom-left-radius: var(--md-shape-corner-small);
+}
+.message-sender {
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  opacity: 0.7;
+}
+.message-time {
+  font-size: 10px;
+  opacity: 0.5;
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* File Message */
+.message-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+.message-file-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--md-shape-corner-medium);
+  background: rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.message-file-info { flex: 1; min-width: 0; }
+.message-file-name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.message-file-size { font-size: 11px; opacity: 0.6; }
+.message-file-action {
+  padding: 6px 16px;
+  border-radius: var(--md-shape-corner-full);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--md-motion-duration-short);
+}
+.message-file-action:hover { opacity: 0.9; }
+
+/* ===== Input Area ===== */
+.input-area {
+  padding: 12px 24px 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  background: var(--md-surface-container);
+  border-top: 1px solid var(--md-outline-variant);
+}
+
+.input-container {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  background: var(--md-surface-container-lowest);
+  border-radius: var(--md-shape-corner-extra-large);
+  padding: 4px 4px 4px 16px;
+  min-height: 48px;
+  transition: background var(--md-motion-duration-short) var(--md-motion-easing-standard);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.input-container:focus-within { background: var(--md-surface-container-lowest); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+
+.input-container input,
+.input-container textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--md-on-surface);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  max-height: 120px;
+  padding: 10px 0;
+  line-height: 1.4;
+}
+.input-container input::placeholder,
+.input-container textarea::placeholder { color: var(--md-on-surface-variant); }
+
+.send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--md-shape-corner-full);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+.send-btn:hover { box-shadow: var(--md-elevation-1); transform: scale(1.05); }
+.send-btn:disabled { opacity: 0.38; cursor: default; transform: none; box-shadow: none; }
+
+/* ===== Empty State ===== */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px;
+}
+.empty-state-icon {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--md-shape-corner-extra-large);
+  background: var(--md-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.empty-state-icon .material-symbols-rounded {
+  font-size: 48px;
+  color: var(--md-on-primary-container);
+}
+.empty-state-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--md-on-surface);
+  letter-spacing: -0.5px;
+}
+.empty-state-desc {
+  font-size: 14px;
+  color: var(--md-on-surface-variant);
+  text-align: center;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+/* ===== Transfer Panel ===== */
+.transfer-panel {
+  width: 0;
+  background: var(--md-surface-container-low);
+  border-left: 1px solid var(--md-outline-variant);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width var(--md-motion-duration-medium) var(--md-motion-easing-emphasized);
+}
+.transfer-panel.open { width: 340px; }
+
+.transfer-header {
+  padding: 20px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.transfer-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.transfer-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px;
+}
+
+.transfer-item {
+  padding: 16px;
+  border-radius: var(--md-shape-corner-large);
+  background: var(--md-surface-container);
+  margin-bottom: 8px;
+  transition: all var(--md-motion-duration-short);
+}
+.transfer-item:hover { background: var(--md-surface-container-high); }
+
+.transfer-item-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.transfer-file-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--md-shape-corner-medium);
+  background: var(--md-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.transfer-file-icon .material-symbols-rounded {
+  color: var(--md-on-primary-container);
+  font-size: 20px;
+}
+.transfer-file-info { flex: 1; min-width: 0; }
+.transfer-file-name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.transfer-file-size { font-size: 11px; color: var(--md-on-surface-variant); }
+
+.transfer-progress-bar {
+  height: 6px;
+  border-radius: var(--md-shape-corner-full);
+  background: var(--md-surface-container-highest);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.transfer-progress-fill {
+  height: 100%;
+  border-radius: var(--md-shape-corner-full);
+  background: var(--md-primary);
+  transition: width var(--md-motion-duration-medium) var(--md-motion-easing-standard);
+}
+.transfer-progress-text {
+  font-size: 11px;
+  color: var(--md-on-surface-variant);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ===== Settings Dialog ===== */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+.dialog-overlay.open { opacity: 1; visibility: visible; }
+
+.dialog {
+  width: 480px;
+  max-height: 80vh;
+  background: var(--md-surface-container-high);
+  border-radius: var(--md-shape-corner-extra-large);
+  padding: 24px;
+  overflow-y: auto;
+  transform: scale(0.9);
+  transition: transform var(--md-motion-duration-medium) var(--md-motion-easing-emphasized);
+}
+.dialog-overlay.open .dialog { transform: scale(1); }
+
+.dialog-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+
+.dialog-field {
+  margin-bottom: 16px;
+}
+.dialog-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+.dialog-field input,
+.dialog-field select {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--md-shape-corner-medium);
+  background: var(--md-surface-container);
+  border: 1px solid var(--md-outline-variant);
+  padding: 0 16px;
+  font-size: 14px;
+  color: var(--md-on-surface);
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--md-motion-duration-short);
+}
+.dialog-field input:focus,
+.dialog-field select:focus { border-color: var(--md-primary); }
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+/* Buttons */
+.btn {
+  height: 40px;
+  padding: 0 24px;
+  border-radius: var(--md-shape-corner-full);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+.btn-text { background: transparent; color: var(--md-primary); }
+.btn-text:hover { background: rgba(103, 80, 164, 0.08); }
+.btn-filled { background: var(--md-primary); color: var(--md-on-primary); }
+.btn-filled:hover { box-shadow: var(--md-elevation-1); }
+.btn-outlined { background: transparent; color: var(--md-primary); border: 1px solid var(--md-outline); }
+.btn-outlined:hover { background: rgba(103, 80, 164, 0.08); }
+.btn-tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.btn-tonal:hover { box-shadow: var(--md-elevation-1); }
+
+/* ===== File Drop Overlay ===== */
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(103, 80, 164, 0.15);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--md-motion-duration-short);
+}
+.drop-overlay.active { opacity: 1; visibility: visible; }
+.drop-overlay-content {
+  text-align: center;
+  color: var(--md-on-primary-container);
+}
+.drop-overlay-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--md-shape-corner-extra-large);
+  background: var(--md-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+.drop-overlay-icon .material-symbols-rounded { font-size: 56px; }
+.drop-overlay-text { font-size: 22px; font-weight: 700; }
+.drop-overlay-sub { font-size: 14px; opacity: 0.7; margin-top: 6px; }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--md-outline-variant);
+  border-radius: var(--md-shape-corner-full);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--md-outline); }
+
+/* ===== Toast ===== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.toast {
+  padding: 12px 24px;
+  border-radius: var(--md-shape-corner-small);
+  background: var(--md-inverse-surface);
+  color: var(--md-inverse-on-surface);
+  font-size: 14px;
+  box-shadow: var(--md-elevation-3);
+  animation: toastIn var(--md-motion-duration-medium) var(--md-motion-easing-emphasized);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .side-panel { width: 0; overflow: hidden; }
+  .side-panel.mobile-open { width: 320px; position: absolute; z-index: 50; height: 100%; }
+  .transfer-panel.open { width: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <!-- Navigation Rail -->
+  <nav class="nav-rail">
+    <div class="nav-rail-logo" title="God-Send">
+      <span class="material-symbols-rounded">near_me</span>
+    </div>
+    <button class="nav-rail-fab" onclick="selectFile()" title="发送文件">
+      <span class="material-symbols-rounded">add</span>
+    </button>
+    <div class="nav-rail-item active" data-tab="chat" onclick="switchTab('chat')">
+      <div class="nav-rail-item-icon">
+        <span class="material-symbols-rounded">chat</span>
+      </div>
+      <span class="nav-rail-item-label">聊天</span>
+    </div>
+    <div class="nav-rail-item" data-tab="devices" onclick="switchTab('devices')">
+      <div class="nav-rail-item-icon">
+        <span class="material-symbols-rounded">devices</span>
+      </div>
+      <span class="nav-rail-item-label">设备</span>
+    </div>
+    <div class="nav-rail-item" data-tab="transfers" onclick="switchTab('transfers')">
+      <div class="nav-rail-item-icon">
+        <span class="material-symbols-rounded">swap_vert</span>
+        <span class="nav-badge" id="transferBadge" style="display:none">0</span>
+      </div>
+      <span class="nav-rail-item-label">传输</span>
+    </div>
+    <div class="nav-rail-spacer"></div>
+    <div class="nav-rail-item" onclick="openSettings()">
+      <div class="nav-rail-item-icon">
+        <span class="material-symbols-rounded">settings</span>
+      </div>
+      <span class="nav-rail-item-label">设置</span>
+    </div>
+  </nav>
+
+  <!-- Side Panel: Device List -->
+  <aside class="side-panel" id="sidePanel">
+    <div class="side-panel-header">
+      <span class="side-panel-title">在线设备</span>
+      <button class="icon-btn" onclick="toggleSidePanel()">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+    </div>
+    <div class="side-panel-search">
+      <span class="material-symbols-rounded">search</span>
+      <input type="text" placeholder="搜索设备..." id="searchInput" oninput="filterDevices()">
+    </div>
+    <div class="side-panel-list" id="deviceList">
+      <!-- Device cards rendered here -->
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="main-header">
+      <button class="icon-btn" onclick="toggleSidePanel()" style="display:none" id="menuBtn">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+      <span class="main-header-title" id="mainTitle">God-Send</span>
+      <div class="main-header-actions">
+        <button class="icon-btn" onclick="toggleTransferPanel()" title="传输列表">
+          <span class="material-symbols-rounded">swap_vert</span>
+        </button>
+        <button class="icon-btn" onclick="openSettings()" title="设置">
+          <span class="material-symbols-rounded">settings</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat View -->
+    <div class="chat-area" id="chatView">
+      <div class="messages-container" id="messagesContainer">
+        <!-- Welcome state -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-state-icon">
+            <span class="material-symbols-rounded">near_me</span>
+          </div>
+          <div class="empty-state-title">God-Send</div>
+          <div class="empty-state-desc">局域网文件传输工具。在同一网络中的设备之间即时发送文件和消息，无需互联网连接。</div>
+        </div>
+      </div>
+      <div class="input-area">
+        <button class="icon-btn" onclick="selectFile()" title="发送文件">
+          <span class="material-symbols-rounded">attach_file</span>
+        </button>
+        <div class="input-container">
+          <input type="text" id="messageInput" placeholder="输入消息..." onkeydown="handleInputKey(event)">
+          <button class="send-btn" onclick="sendMessage()" id="sendBtn" disabled>
+            <span class="material-symbols-rounded">send</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Devices View -->
+    <div class="chat-area" id="devicesView" style="display:none">
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <span class="material-symbols-rounded">devices</span>
+        </div>
+        <div class="empty-state-title">设备发现</div>
+        <div class="empty-state-desc">正在搜索局域网中的 God-Send 设备...<br>确保其他设备也在同一网络中运行。</div>
+      </div>
+    </div>
+
+    <!-- Transfers View -->
+    <div class="chat-area" id="transfersView" style="display:none">
+      <div class="empty-state" id="transfersEmpty">
+        <div class="empty-state-icon">
+          <span class="material-symbols-rounded">swap_vert</span>
+        </div>
+        <div class="empty-state-title">文件传输</div>
+        <div class="empty-state-desc">暂无传输任务。拖拽文件到窗口或点击 + 按钮开始发送。</div>
+      </div>
+      <div class="messages-container" id="transfersList" style="display:none"></div>
+    </div>
+  </main>
+
+  <!-- Transfer Side Panel -->
+  <aside class="transfer-panel" id="transferPanel">
+    <div class="transfer-header">
+      <span class="transfer-title">传输列表</span>
+      <button class="icon-btn" onclick="toggleTransferPanel()">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div class="transfer-list" id="transferPanelList"></div>
+  </aside>
+</div>
+
+<!-- Settings Dialog -->
+<div class="dialog-overlay" id="settingsDialog">
+  <div class="dialog">
+    <div class="dialog-title">设置</div>
+    <div class="dialog-field">
+      <label>设备名称</label>
+      <input type="text" id="settingDeviceName" placeholder="我的电脑">
+    </div>
+    <div class="dialog-field">
+      <label>下载目录</label>
+      <input type="text" id="settingDownloadDir" placeholder="~/Downloads/God-Send" readonly>
+    </div>
+    <div class="dialog-field">
+      <label>服务端口</label>
+      <input type="text" id="settingPort" placeholder="5780" readonly>
+    </div>
+    <div class="dialog-field">
+      <label>设备 ID</label>
+      <input type="text" id="settingDeviceId" placeholder="-" readonly style="opacity:0.6">
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-text" onclick="closeSettings()">取消</button>
+      <button class="btn btn-filled" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- File Drop Overlay -->
+<div class="drop-overlay" id="dropOverlay">
+  <div class="drop-overlay-content">
+    <div class="drop-overlay-icon">
+      <span class="material-symbols-rounded">upload_file</span>
+    </div>
+    <div class="drop-overlay-text">释放以发送文件</div>
+    <div class="drop-overlay-sub">文件将发送到所有已连接的设备</div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Hidden File Input -->
+<input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(event)">
+
+<script>
+// ===== State =====
+let ws = null;
+let serverUrl = '';
+let deviceInfo = {};
+let peers = [];
+let transfers = [];
+let currentTab = 'chat';
+let sidePanelOpen = true;
+let transferPanelOpen = false;
+
+// ===== Init =====
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    deviceInfo = await window.go.main.App.GetDeviceInfo();
+    serverUrl = await window.go.main.App.GetServerURL();
+    document.getElementById('mainTitle').textContent = deviceInfo.device_name || 'God-Send';
+    document.getElementById('settingDeviceName').value = deviceInfo.device_name || '';
+    document.getElementById('settingDownloadDir').value = deviceInfo.download_dir || '';
+    document.getElementById('settingPort').value = deviceInfo.port || '';
+    document.getElementById('settingDeviceId').value = deviceInfo.device_id || '';
+    connectWebSocket();
+    refreshPeers();
+    setupDragDrop();
+  } catch(e) {
+    console.error('Init error:', e);
+    showToast('初始化失败: ' + e.message);
+  }
+  document.getElementById('messageInput').addEventListener('input', updateSendBtn);
+});
+
+// ===== WebSocket =====
+function connectWebSocket() {
+  if (ws && ws.readyState === WebSocket.OPEN) return;
+  const url = serverUrl.replace('http', 'ws') + '/ws';
+  ws = new WebSocket(url);
+  ws.onopen = () => { console.log('WS connected'); };
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      handleWSMessage(msg);
+    } catch(err) { console.error('WS parse error:', err); }
+  };
+  ws.onclose = () => { setTimeout(connectWebSocket, 3000); };
+  ws.onerror = () => {};
+}
+
+function handleWSMessage(msg) {
+  switch(msg.type) {
+    case 'text':
+      addChatBubble(msg.sender_name, msg.sender_color, msg.payload?.content || '', 'received', msg.timestamp);
+      break;
+    case 'file':
+    case 'image':
+      addFileBubble(msg.sender_name, msg.sender_color, msg.payload, msg.type, 'received', msg.timestamp);
+      break;
+    case 'device_announce':
+      refreshPeers();
+      break;
+    case 'device_leave':
+      refreshPeers();
+      break;
+    case 'progress':
+      updateTransferProgress(msg.payload);
+      break;
+  }
+}
+
+// ===== Chat =====
+function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const text = input.value.trim();
+  if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+  const msg = {
+    id: 'msg_' + Date.now(),
+    type: 'text',
+    payload: { content: text },
+    timestamp: new Date().toISOString()
+  };
+  ws.send(JSON.stringify(msg));
+  addChatBubble(deviceInfo.device_name, deviceInfo.color, text, 'sent', msg.timestamp);
+  input.value = '';
+  updateSendBtn();
+}
+
+function handleInputKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function updateSendBtn() {
+  const v = document.getElementById('messageInput').value.trim();
+  document.getElementById('sendBtn').disabled = !v;
+}
+
+function addChatBubble(name, color, text, type, timestamp) {
+  hideEmptyState();
+  const container = document.getElementById('messagesContainer');
+  const div = document.createElement('div');
+  div.className = 'message-bubble ' + type;
+  const t = timestamp ? new Date(timestamp).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}) : '';
+  const initial = (name || '?')[0].toUpperCase();
+  div.innerHTML = `
+    ${type === 'received' ? `<div class="message-sender" style="color:${color || 'var(--md-primary)'}">${name || '未知'}</div>` : ''}
+    <div>${escapeHtml(text)}</div>
+    <div class="message-time">${t}</div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function addFileBubble(name, color, payload, msgType, type, timestamp) {
+  hideEmptyState();
+  const container = document.getElementById('messagesContainer');
+  const div = document.createElement('div');
+  div.className = 'message-bubble ' + type;
+  const t = timestamp ? new Date(timestamp).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}) : '';
+  const isImage = msgType === 'image';
+  const icon = isImage ? 'image' : 'description';
+  const sizeStr = formatSize(payload?.file_size || 0);
+  const downloadUrl = payload?.download_url || '';
+  div.innerHTML = `
+    ${type === 'received' ? `<div class="message-sender" style="color:${color || 'var(--md-primary)'}">${name || '未知'}</div>` : ''}
+    <div class="message-file">
+      <div class="message-file-icon"><span class="material-symbols-rounded">${icon}</span></div>
+      <div class="message-file-info">
+        <div class="message-file-name">${escapeHtml(payload?.file_name || '文件')}</div>
+        <div class="message-file-size">${sizeStr}</div>
+      </div>
+      ${downloadUrl ? `<button class="message-file-action" onclick="downloadFile('${serverUrl}${downloadUrl}','${escapeHtml(payload?.file_name || 'file')}')">下载</button>` : ''}
+    </div>
+    <div class="message-time">${t}</div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function hideEmptyState() {
+  const es = document.getElementById('emptyState');
+  if (es) es.style.display = 'none';
+}
+
+// ===== File Transfer =====
+function selectFile() {
+  document.getElementById('fileInput').click();
+}
+
+function handleFileSelect(event) {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+  for (const file of files) {
+    uploadFile(file);
+  }
+  event.target.value = '';
+}
+
+function uploadFile(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('sender_id', deviceInfo.device_id || '');
+  formData.append('sender_name', deviceInfo.device_name || '');
+  formData.append('sender_color', deviceInfo.color || '');
+
+  const transferId = 'transfer_' + Date.now();
+  addTransferItem(transferId, file.name, file.size, 0, 'uploading');
+
+  fetch(serverUrl + '/api/upload', {
+    method: 'POST',
+    body: formData
+  }).then(r => r.json()).then(data => {
+    if (data.success) {
+      updateTransferItem(transferId, 100, 'completed');
+      addFileBubble(deviceInfo.device_name, deviceInfo.color, {
+        file_name: data.file_name,
+        file_size: data.file_size,
+        download_url: data.download_url || ('/api/download/' + data.file_id)
+      }, data.file_name && /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(data.file_name) ? 'image' : 'file', 'sent', new Date().toISOString());
+      showToast('文件发送成功: ' + data.file_name);
+    } else {
+      updateTransferItem(transferId, 0, 'error');
+      showToast('发送失败');
+    }
+  }).catch(err => {
+    updateTransferItem(transferId, 0, 'error');
+    showToast('发送错误: ' + err.message);
+  });
+}
+
+function downloadFile(url, filename) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  showToast('开始下载: ' + filename);
+}
+
+// ===== Drag & Drop =====
+function setupDragDrop() {
+  let dragCounter = 0;
+  const overlay = document.getElementById('dropOverlay');
+  document.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    dragCounter++;
+    overlay.classList.add('active');
+  });
+  document.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter <= 0) { dragCounter = 0; overlay.classList.remove('active'); }
+  });
+  document.addEventListener('dragover', (e) => e.preventDefault());
+  document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragCounter = 0;
+    overlay.classList.remove('active');
+    const files = e.dataTransfer.files;
+    for (const file of files) uploadFile(file);
+  });
+}
+
+// ===== Transfer Items =====
+function addTransferItem(id, name, size, progress, state) {
+  transfers.push({ id, name, size, progress, state });
+  renderTransfers();
+  updateTransferBadge();
+}
+
+function updateTransferItem(id, progress, state) {
+  const t = transfers.find(t => t.id === id);
+  if (t) { t.progress = progress; t.state = state; }
+  renderTransfers();
+  updateTransferBadge();
+}
+
+function updateTransferProgress(payload) {
+  if (!payload) return;
+  const t = transfers.find(t => t.name === payload.file_name);
+  if (t) { t.progress = payload.percentage || 0; t.state = payload.state || 'transferring'; }
+  renderTransfers();
+}
+
+function renderTransfers() {
+  const list = document.getElementById('transfersList');
+  const panelList = document.getElementById('transferPanelList');
+  const empty = document.getElementById('transfersEmpty');
+  if (transfers.length === 0) {
+    if (empty) empty.style.display = '';
+    list.style.display = 'none';
+    panelList.innerHTML = '<div style="padding:20px;text-align:center;color:var(--md-on-surface-variant)">暂无传输</div>';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  list.style.display = '';
+  const html = transfers.map(t => {
+    const pct = Math.round(t.progress || 0);
+    const stateText = { uploading:'上传中', downloading:'下载中', completed:'已完成', error:'失败', pending:'等待中', cancelled:'已取消' }[t.state] || t.state;
+    const icon = t.state === 'completed' ? 'check_circle' : t.state === 'error' ? 'error' : 'progress_activity';
+    return `<div class="transfer-item">
+      <div class="transfer-item-header">
+        <div class="transfer-file-icon"><span class="material-symbols-rounded">description</span></div>
+        <div class="transfer-file-info">
+          <div class="transfer-file-name">${escapeHtml(t.name)}</div>
+          <div class="transfer-file-size">${formatSize(t.size)} · ${stateText}</div>
+        </div>
+        <span class="material-symbols-rounded" style="color:${t.state==='completed'?'#4CAF50':t.state==='error'?'var(--md-error)':'var(--md-primary)'}">${icon}</span>
+      </div>
+      ${t.state !== 'completed' && t.state !== 'error' ? `<div class="transfer-progress-bar"><div class="transfer-progress-fill" style="width:${pct}%"></div></div>
+      <div class="transfer-progress-text"><span>${stateText}</span><span>${pct}%</span></div>` : ''}
+    </div>`;
+  }).join('');
+  list.innerHTML = html;
+  panelList.innerHTML = html;
+}
+
+function updateTransferBadge() {
+  const active = transfers.filter(t => t.state !== 'completed' && t.state !== 'error' && t.state !== 'cancelled').length;
+  const badge = document.getElementById('transferBadge');
+  if (active > 0) { badge.textContent = active; badge.style.display = ''; }
+  else { badge.style.display = 'none'; }
+}
+
+// ===== Devices / Peers =====
+async function refreshPeers() {
+  try {
+    const data = await window.go.main.App.GetPeers();
+    peers = JSON.parse(data || '[]');
+    renderDeviceList();
+  } catch(e) { console.error('GetPeers error:', e); }
+}
+
+function renderDeviceList() {
+  const list = document.getElementById('deviceList');
+  if (peers.length === 0) {
+    list.innerHTML = `<div style="padding:32px;text-align:center;color:var(--md-on-surface-variant)">
+      <span class="material-symbols-rounded" style="font-size:48px;display:block;margin-bottom:12px;opacity:0.3">device_unknown</span>
+      正在搜索附近设备...
+    </div>`;
+    return;
+  }
+  list.innerHTML = peers.map(p => {
+    const initial = (p.name || '?')[0].toUpperCase();
+    const color = p.avatar_color || '#6750A4';
+    return `<div class="device-card" onclick="selectPeer('${p.id}')">
+      <div class="device-avatar" style="background:${color}">
+        ${initial}
+        <div class="online-dot"></div>
+      </div>
+      <div class="device-info">
+        <div class="device-name">${escapeHtml(p.name || '未知设备')}</div>
+        <div class="device-status">${p.ip_address}:${p.port}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterDevices() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cards = document.querySelectorAll('.device-card');
+  cards.forEach(card => {
+    const name = card.querySelector('.device-name').textContent.toLowerCase();
+    card.style.display = name.includes(q) ? '' : 'none';
+  });
+}
+
+function selectPeer(id) {
+  document.querySelectorAll('.device-card').forEach(c => c.classList.remove('active'));
+  const peer = peers.find(p => p.id === id);
+  if (peer) {
+    document.getElementById('mainTitle').textContent = peer.name;
+  }
+}
+
+// ===== Tab Switching =====
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.nav-rail-item[data-tab]').forEach(item => {
+    item.classList.toggle('active', item.dataset.tab === tab);
+  });
+  document.getElementById('chatView').style.display = tab === 'chat' ? '' : 'none';
+  document.getElementById('devicesView').style.display = tab === 'devices' ? '' : 'none';
+  document.getElementById('transfersView').style.display = tab === 'transfers' ? '' : 'none';
+  if (tab === 'devices') refreshPeers();
+  if (tab === 'transfers') renderTransfers();
+}
+
+// ===== Panels =====
+function toggleSidePanel() {
+  sidePanelOpen = !sidePanelOpen;
+  document.getElementById('sidePanel').classList.toggle('collapsed', !sidePanelOpen);
+  document.getElementById('menuBtn').style.display = sidePanelOpen ? 'none' : '';
+}
+
+function toggleTransferPanel() {
+  transferPanelOpen = !transferPanelOpen;
+  document.getElementById('transferPanel').classList.toggle('open', transferPanelOpen);
+}
+
+// ===== Settings =====
+function openSettings() {
+  document.getElementById('settingsDialog').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsDialog').classList.remove('open');
+}
+async function saveSettings() {
+  const name = document.getElementById('settingDeviceName').value.trim();
+  if (name) {
+    try { await window.go.main.App.SetDeviceName(name); } catch(e) {}
+    deviceInfo.device_name = name;
+    document.getElementById('mainTitle').textContent = name;
+  }
+  closeSettings();
+  showToast('设置已保存');
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
+// ===== Utils =====
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+function formatSize(bytes) {
+  if (!bytes) return '0 B';
+  const units = ['B','KB','MB','GB','TB'];
+  let i = 0;
+  let size = bytes;
+  while (size >= 1024 && i < units.length - 1) { size /= 1024; i++; }
+  return size.toFixed(i > 0 ? 1 : 0) + ' ' + units[i];
+}
+
+// Periodic refresh
+setInterval(() => { if (currentTab === 'devices') refreshPeers(); }, 10000);
+</script>
+</body>
+</html>

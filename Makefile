@@ -13,13 +13,22 @@ GOFLAGS := -trimpath -ldflags="-s -w -X main.version=$(VERSION)"
 # 默认目标
 all: build-wails
 
+# 准备构建资源（从assets复制到build）
+setup:
+	@echo "Setting up build resources..."
+	@if not exist "build\windows" mkdir "build\windows"
+	@copy /y "assets\appicon.png" "build\appicon.png" >nul
+	@copy /y "assets\windows\icon.ico" "build\windows\icon.ico" >nul
+	@copy /y "assets\windows\info.json" "build\windows\info.json" >nul
+	@copy /y "assets\windows\wails.exe.manifest" "build\windows\wails.exe.manifest" >nul
+
 # 构建Wails桌面应用(Windows便携版)
-build:
+build: setup
 	@echo "Building God-Send desktop app..."
 	wails build -clean -o $(APP_NAME).exe -ldflags "-s -w -X main.version=$(VERSION)"
 
 # 构建Wails桌面应用(Windows便携版)
-build-wails:
+build-wails: setup
 	@echo "Building God-Send desktop app..."
 	wails build -clean -o $(APP_NAME).exe -ldflags "-s -w -X main.version=$(VERSION)"
 

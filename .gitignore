@@ -1,6 +1,6 @@
 # 构建产物
 build/
-dist/
+/dist/
 bin/
 *.exe
 *.dll
@@ -23,6 +23,7 @@ frontend/dist/*.map
 # IDE
 .idea/
 .vscode/
+.joycode/
 *.swp
 *.swo
 *~
@@ -37,6 +38,10 @@ desktop.ini
 *.tmp
 .env
 .env.local
+
+# Android SDK工具（非项目源码）
+cmdline-tools/
+cmdline-tools.zip
 
 # 传输目录
 transfers/
