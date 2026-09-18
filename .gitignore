@@ -1,0 +1,43 @@
+# 构建产物
+build/
+dist/
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+*.aar
+*.apk
+
+# Go
+*.o
+*.a
+*.test
+*.out
+vendor/
+
+# Wails
+frontend/node_modules/
+frontend/dist/*.map
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 临时文件
+*.log
+*.tmp
+.env
+.env.local
+
+# 传输目录
+transfers/
+thumbnails/

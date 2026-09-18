@@ -1,0 +1,125 @@
+name: Build 神传
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+env:
+  GO_VERSION: '1.27'
+  NODE_VERSION: '20'
+
+jobs:
+  # Windows x64 构建
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Build Wails App
+        run: wails build -clean -ldflags "-s -w -X main.version=${{ github.ref_name }}"
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shenchuan-windows-x64
+          path: build/bin/shenchuan.exe
+
+  # CLI版本构建(Windows)
+  build-cli:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Build CLI
+        run: |
+          mkdir -p build
+          go build -trimpath -ldflags="-s -w" -o build/shenchuan-cli.exe ./cmd/shenchuan
+
+      - name: Upload CLI Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shenchuan-cli-windows-x64
+          path: build/shenchuan-cli.exe
+
+  # Android ARM64 构建
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install gomobile
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          gomobile init
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Build Android AAR
+        run: |
+          mkdir -p build
+          gomobile bind -target=android/arm64 -o build/shenchuan.aar ./cmd/android
+
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shenchuan-android-arm64
+          path: build/shenchuan.aar
+
+  # 发布(当打tag时触发)
+  release:
+    needs: [build-windows, build-cli, build-android]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/shenchuan-windows-x64/shenchuan.exe
+            artifacts/shenchuan-cli-windows-x64/shenchuan-cli.exe
+            artifacts/shenchuan-android-arm64/shenchuan.aar
+          generate_release_notes: true
+          draft: false
