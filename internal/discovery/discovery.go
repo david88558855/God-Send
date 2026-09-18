@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/hashicorp/mdns"
-	"github.com/shenchuan/shenchuan/internal/config"
-	"github.com/shenchuan/shenchuan/internal/network"
-	"github.com/shenchuan/shenchuan/internal/protocol"
+	"github.com/God-Send/God-Send/internal/config"
+	"github.com/God-Send/God-Send/internal/network"
+	"github.com/God-Send/God-Send/internal/protocol"
 )
 
 // Discovery 设备发现服务
@@ -69,6 +69,7 @@ func (d *Discovery) Start() error {
 		config.MDNSDomain,             // 域
 		"",                            // 主机名(自动)
 		d.config.Port,                 // 端口
+		[]net.IP{net.ParseIP(ip)},     // IP地址
 		[]string{                      // TXT记录
 			"path=/",
 			"device_name=" + d.config.DeviceName,
@@ -76,7 +77,6 @@ func (d *Discovery) Start() error {
 			"platform=" + getPlatform(),
 			"color=" + d.config.AvatarColor,
 		},
-		[]net.IP{net.ParseIP(ip)},     // IP地址
 	)
 	if err != nil {
 		return fmt.Errorf("创建mDNS服务失败: %w", err)

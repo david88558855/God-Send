@@ -1,31 +1,31 @@
-# 神传 - Makefile
-# 局域网文件传输工具
+# God-Send - Makefile
+# LAN File Transfer Tool
 
-.PHONY: all build build-cli build-wails build-android clean dev run test
+.PHONY: all build build-wails build-android clean dev test
 
 # 变量
-APP_NAME := shenchuan
+APP_NAME := God-Send
 VERSION := 1.0.0
 BUILD_DIR := build
 GO := go
 GOFLAGS := -trimpath -ldflags="-s -w -X main.version=$(VERSION)"
 
 # 默认目标
-all: build-cli
+all: build-wails
 
-# 构建CLI版本
-build-cli:
-	@echo "构建CLI版本..."
-	$(GO) build $(GOFLAGS) -o $(BUILD_DIR)/$(APP_NAME).exe ./cmd/shenchuan
+# 构建Wails桌面应用(Windows便携版)
+build:
+	@echo "Building God-Send desktop app..."
+	wails build -clean -o $(APP_NAME).exe -ldflags "-s -w -X main.version=$(VERSION)"
 
-# 构建Wails桌面应用(Windows)
+# 构建Wails桌面应用(Windows便携版)
 build-wails:
-	@echo "构建Wails桌面应用..."
+	@echo "Building God-Send desktop app..."
 	wails build -clean -o $(APP_NAME).exe -ldflags "-s -w -X main.version=$(VERSION)"
 
 # 构建Android AAR绑定
 build-android:
-	@echo "构建Android绑定..."
+	@echo "Building Android binding..."
 	$(GO) install golang.org/x/mobile/cmd/gomobile@latest
 	gomobile init
 	gomobile bind -target=android/arm64 -o $(BUILD_DIR)/$(APP_NAME).aar ./cmd/android
@@ -34,13 +34,9 @@ build-android:
 dev:
 	wails dev
 
-# 运行CLI
-run:
-	$(GO) run ./cmd/shenchuan
-
 # 清理构建产物
 clean:
-	@echo "清理构建产物..."
+	@echo "Cleaning build artifacts..."
 	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
 	$(GO) clean
 
@@ -62,23 +58,22 @@ lint:
 	golangci-lint run ./...
 
 # 构建所有平台
-build-all: build-cli build-wails build-android
-	@echo "所有平台构建完成!"
+build-all: build-wails build-android
+	@echo "All platforms built!"
 
 # 显示帮助
 help:
-	@echo "神传 - 局域网文件传输工具"
+	@echo "God-Send - LAN File Transfer Tool"
 	@echo ""
-	@echo "可用目标:"
-	@echo "  build-cli      构建CLI版本(Windows可执行文件)"
-	@echo "  build-wails    构建Wails桌面应用(Windows)"
-	@echo "  build-android  构建Android AAR绑定"
-	@echo "  build-all      构建所有平台"
-	@echo "  dev            启动Wails开发模式"
-	@echo "  run            运行CLI版本"
-	@echo "  clean          清理构建产物"
-	@echo "  test           运行测试"
-	@echo "  deps           下载依赖"
-	@echo "  fmt            格式化代码"
-	@echo "  lint           代码检查"
-	@echo "  help           显示此帮助信息"
+	@echo "Available targets:"
+	@echo "  build           Build Wails desktop app (Windows portable)"
+	@echo "  build-wails     Build Wails desktop app (Windows portable)"
+	@echo "  build-android   Build Android AAR binding"
+	@echo "  build-all       Build all platforms"
+	@echo "  dev             Start Wails dev mode"
+	@echo "  clean           Clean build artifacts"
+	@echo "  test            Run tests"
+	@echo "  deps            Download dependencies"
+	@echo "  fmt             Format code"
+	@echo "  lint            Code linting"
+	@echo "  help            Show this help"

@@ -9,9 +9,9 @@ import (
 
 const (
 	// AppName 应用名称
-	AppName = "神传"
+	AppName = "God-Send"
 	// AppID 应用标识
-	AppID = "com.shenchuan.app"
+	AppID = "com.godsend.app"
 	// Version 版本号
 	Version = "1.0.0"
 	// DefaultPort 默认HTTP服务端口
@@ -21,7 +21,7 @@ const (
 	// DefaultAPIPath API路径前缀
 	DefaultAPIPath = "/api"
 	// MDNSServiceName mDNS服务名称
-	MDNSServiceName = "_shenchuan._tcp"
+	MDNSServiceName = "_godsend._tcp"
 	// MDNSDomain mDNS域
 	MDNSDomain = "local."
 	// MaxFileSize 最大文件大小 (10GB)
@@ -51,8 +51,8 @@ type Config struct {
 // DefaultConfig 返回默认配置
 func DefaultConfig() *Config {
 	homeDir, _ := os.UserHomeDir()
-	dataDir := filepath.Join(homeDir, ".shenchuan")
-	downloadDir := filepath.Join(homeDir, "Downloads", "ShenChuan")
+	dataDir := filepath.Join(homeDir, ".godsend")
+	downloadDir := filepath.Join(homeDir, "Downloads", "God-Send")
 
 	return &Config{
 		DeviceName:  getDeviceName(),

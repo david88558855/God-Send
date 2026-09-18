@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/shenchuan/shenchuan/internal/config"
-	"github.com/shenchuan/shenchuan/internal/discovery"
-	"github.com/shenchuan/shenchuan/internal/server"
-	"github.com/shenchuan/shenchuan/internal/transfer"
+	"github.com/God-Send/God-Send/internal/config"
+	"github.com/God-Send/God-Send/internal/discovery"
+	"github.com/God-Send/God-Send/internal/server"
+	"github.com/God-Send/God-Send/internal/transfer"
 )
 
-// ShenchuanApp Android绑定应用
-type ShenchuanApp struct {
+// GodSendApp Android绑定应用
+type GodSendApp struct {
 	config    *config.Config
 	discovery *discovery.Discovery
 	server    *server.Server
@@ -21,13 +21,13 @@ type ShenchuanApp struct {
 	running   bool
 }
 
-// NewShenchuanApp 创建应用实例(导出给Android调用)
-func NewShenchuanApp() *ShenchuanApp {
-	return &ShenchuanApp{}
+// NewGodSendApp 创建应用实例(导出给Android调用)
+func NewGodSendApp() *GodSendApp {
+	return &GodSendApp{}
 }
 
 // Start 启动服务(导出给Android调用)
-func (a *ShenchuanApp) Start() error {
+func (a *GodSendApp) Start() error {
 	if a.running {
 		return nil
 	}
@@ -52,23 +52,23 @@ func (a *ShenchuanApp) Start() error {
 
 	// 启动设备发现
 	if err := disc.Start(); err != nil {
-		log.Printf("警告: 设备发现启动失败: %v", err)
+		log.Printf("Warning: device discovery failed: %v", err)
 	}
 
 	// 启动服务器
 	go func() {
 		if err := srv.Start(); err != nil {
-			log.Printf("服务器启动失败: %v", err)
+			log.Printf("Server start failed: %v", err)
 		}
 	}()
 
 	a.running = true
-	log.Println("神传Android服务已启动")
+	log.Println("God-Send Android service started")
 	return nil
 }
 
 // Stop 停止服务(导出给Android调用)
-func (a *ShenchuanApp) Stop() {
+func (a *GodSendApp) Stop() {
 	if !a.running {
 		return
 	}
@@ -80,11 +80,11 @@ func (a *ShenchuanApp) Stop() {
 		a.discovery.Stop()
 	}
 	a.running = false
-	log.Println("神传Android服务已停止")
+	log.Println("God-Send Android service stopped")
 }
 
 // GetServerURL 获取服务器地址(导出给Android WebView调用)
-func (a *ShenchuanApp) GetServerURL() string {
+func (a *GodSendApp) GetServerURL() string {
 	if !a.running || a.config == nil {
 		return ""
 	}
@@ -92,7 +92,7 @@ func (a *ShenchuanApp) GetServerURL() string {
 }
 
 // GetDeviceInfo 获取设备信息(导出给Android调用)
-func (a *ShenchuanApp) GetDeviceInfo() map[string]interface{} {
+func (a *GodSendApp) GetDeviceInfo() map[string]interface{} {
 	if a.config == nil {
 		return nil
 	}
@@ -107,7 +107,7 @@ func (a *ShenchuanApp) GetDeviceInfo() map[string]interface{} {
 func main() {
 	// Android入口由gomobile绑定管理
 	// 此main函数仅用于编译检查
-	app := NewShenchuanApp()
+	app := NewGodSendApp()
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
 	}

@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"embed"
+	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/God-Send/God-Send/internal/config"
@@ -16,28 +18,20 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:../../frontend/dist
+//go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
-	// 创建配置
 	cfg := config.DefaultConfig()
 
-	// 确保目录存在
 	if err := cfg.EnsureDirs(); err != nil {
 		log.Fatalf("初始化目录失败: %v", err)
 	}
 
-	// 创建发现服务
 	disc := discovery.New(cfg)
-
-	// 创建传输管理器
 	mgr := transfer.NewManager(cfg)
-
-	// 创建并启动HTTP服务器
 	srv := server.New(cfg, disc, mgr)
 
-	// 设置设备发现回调
 	disc.SetCallbacks(
 		func(peer *protocol.DeviceInfo) {
 			log.Printf("[发现] 设备上线: %s", peer.Name)
@@ -47,28 +41,25 @@ func main() {
 		},
 	)
 
-	// 启动设备发现
 	if err := disc.Start(); err != nil {
 		log.Printf("警告: 设备发现启动失败: %v", err)
 	}
 
-	// 启动服务器
 	go func() {
 		if err := srv.Start(); err != nil {
 			log.Printf("服务器启动失败: %v", err)
 		}
 	}()
 
-	// 创建Wails应用
 	app := &App{
 		config:    cfg,
 		discovery: disc,
 		server:    srv,
+		transfer:  mgr,
 	}
 
-	// 启动Wails
 	if err := wails.Run(&options.App{
-		Title:     "God-Send - LAN File Transfer",
+		Title:     "God-Send",
 		Width:     1024,
 		Height:    768,
 		MinWidth:  768,
@@ -76,7 +67,7 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 1},
+		BackgroundColour: &options.RGBA{R: 28, G: 27, B: 31, A: 255},
 		OnStartup:  app.startup,
 		OnShutdown: app.shutdown,
 		Bind: []interface{}{
@@ -93,6 +84,7 @@ type App struct {
 	config    *config.Config
 	discovery *discovery.Discovery
 	server    *server.Server
+	transfer  *transfer.Manager
 }
 
 func (a *App) startup(ctx context.Context) {
@@ -106,12 +98,49 @@ func (a *App) shutdown(ctx context.Context) {
 	a.discovery.Stop()
 }
 
-// GetDeviceInfo 返回设备信息(供前端调用)
+// GetDeviceInfo 返回设备信息
 func (a *App) GetDeviceInfo() map[string]interface{} {
 	return map[string]interface{}{
 		"device_name": a.config.DeviceName,
 		"device_id":   a.discovery.GetDeviceID(),
 		"port":        a.config.Port,
 		"platform":    "windows",
+		"color":       a.config.AvatarColor,
+		"download_dir": a.config.DownloadDir,
 	}
+}
+
+// GetServerURL 返回本地服务器URL
+func (a *App) GetServerURL() string {
+	return fmt.Sprintf("http://127.0.0.1:%d", a.config.Port)
+}
+
+// GetPeers 返回已发现的设备列表
+func (a *App) GetPeers() string {
+	peers := a.discovery.GetPeers()
+	data, _ := json.Marshal(peers)
+	return string(data)
+}
+
+// GetTransfers 返回传输列表
+func (a *App) GetTransfers() string {
+	transfers := a.transfer.GetTransfers()
+	data, _ := json.Marshal(transfers)
+	return string(data)
+}
+
+// SetDeviceName 设置设备名称
+func (a *App) SetDeviceName(name string) {
+	a.config.DeviceName = name
+}
+
+// GetConfig 返回配置信息
+func (a *App) GetConfig() string {
+	data, _ := json.Marshal(map[string]interface{}{
+		"device_name":  a.config.DeviceName,
+		"port":         a.config.Port,
+		"download_dir": a.config.DownloadDir,
+		"color":        a.config.AvatarColor,
+	})
+	return string(data)
 }

@@ -14,8 +14,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/shenchuan/shenchuan/internal/config"
-	"github.com/shenchuan/shenchuan/internal/protocol"
+	"github.com/God-Send/God-Send/internal/config"
+	"github.com/God-Send/God-Send/internal/protocol"
 )
 
 // Manager 传输管理器

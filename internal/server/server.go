@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/shenchuan/shenchuan/internal/config"
-	"github.com/shenchuan/shenchuan/internal/discovery"
-	"github.com/shenchuan/shenchuan/internal/protocol"
-	"github.com/shenchuan/shenchuan/internal/transfer"
+	"github.com/God-Send/God-Send/internal/config"
+	"github.com/God-Send/God-Send/internal/discovery"
+	"github.com/God-Send/God-Send/internal/protocol"
+	"github.com/God-Send/God-Send/internal/transfer"
 )
 
 var upgrader = websocket.Upgrader{
