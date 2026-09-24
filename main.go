@@ -10,6 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"God-Send/godsend"
+
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -20,7 +22,7 @@ import (
 var frontendDist embed.FS
 
 // 全局配置（供app.go使用）
-var appConfig *Config
+var appConfig *godsend.Config
 
 // addFirewallRule 添加Windows防火墙入站规则（允许指定端口的连接）
 func addFirewallRule(name string, protocol string, port int) {
@@ -44,7 +46,7 @@ func main() {
 	log.Println("[主程序] God-Send 启动中...")
 
 	// 加载配置
-	cfg := LoadConfig()
+	cfg := godsend.LoadConfig()
 	appConfig = cfg
 	log.Printf("[主程序] 设备: %s (%s), QUIC端口: %d", cfg.GetDeviceName(), cfg.GetDeviceID(), cfg.GetPort())
 
@@ -60,21 +62,21 @@ func main() {
 	}
 
 	// 创建设备发现服务
-	disc := NewDiscovery(cfg)
+	disc := godsend.NewDiscovery(cfg)
 
 	// 创建网络服务
-	net := NewNetwork(cfg, disc)
+	net := godsend.NewNetwork(cfg, disc)
 
 	// 创建API服务
-	api := NewAPI(cfg, disc, net)
+	api := godsend.NewAPI(cfg, disc, net)
 
 	// 设置回调：网络消息 -> API处理
-	net.SetOnMessage(func(msg *Message) {
+	net.SetOnMessage(func(msg *godsend.Message) {
 		api.OnIncomingMessage(msg)
 	})
 
 	// 设置回调：文件传输完成 -> API处理
-	net.SetOnFileComplete(func(fileID string, pf *pendingFile, finalPath string) {
+	net.SetOnFileComplete(func(fileID string, pf *godsend.PendingFile, finalPath string) {
 		api.OnFileComplete(fileID, pf, finalPath)
 	})
 

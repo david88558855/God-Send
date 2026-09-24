@@ -1,4 +1,4 @@
-package main
+package godsend
 
 import (
 	"crypto/rand"
@@ -772,8 +772,8 @@ func (a *API) OnFileProgress(fileID string, received int64, total int64) {
 	// 如果total为0，尝试从pendingFiles获取
 	if total <= 0 {
 		pf := a.network.GetPendingFile(fileID)
-		if pf != nil && pf.fileSize > 0 {
-			total = pf.fileSize
+		if pf != nil && pf.FileSize > 0 {
+			total = pf.FileSize
 		}
 	}
 
@@ -828,11 +828,11 @@ func (a *API) OnIncomingMessage(msg *Message) {
 }
 
 // OnFileComplete 处理文件传输完成
-func (a *API) OnFileComplete(fileID string, pf *pendingFile, finalPath string) {
+func (a *API) OnFileComplete(fileID string, pf *PendingFile, finalPath string) {
 	// 构造下载URL
 	fileName := ""
 	if pf != nil {
-		fileName = pf.fileName
+		fileName = pf.FileName
 	}
 	if fileName == "" {
 		fileName = filepath.Base(finalPath)
@@ -853,10 +853,10 @@ func (a *API) OnFileComplete(fileID string, pf *pendingFile, finalPath string) {
 	}
 
 	if pf != nil {
-		record.From = pf.fromID
-		record.FromName = pf.fromName
-		record.To = pf.toID
-		record.FileSize = pf.fileSize
+		record.From = pf.FromID
+		record.FromName = pf.FromName
+		record.To = pf.ToID
+		record.FileSize = pf.FileSize
 	}
 
 	// 更新历史记录中对应的file offer记录，添加下载URL和更新状态

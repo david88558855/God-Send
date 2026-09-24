@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+
+	"God-Send/godsend"
 )
 
 // App Wails应用绑定结构
@@ -33,4 +35,9 @@ func (a *App) GetDeviceName() string {
 		return appConfig.GetDeviceName()
 	}
 	return "未知设备"
+}
+
+// GetConfig 获取配置（供前端调用）
+func (a *App) GetConfig() *godsend.Config {
+	return appConfig
 }

@@ -31,6 +31,26 @@
 | UDP 广播 | 53334 | 设备发现 |
 | HTTP/WS | 53334 | 网页版访问（可关闭） |
 
+## 项目结构
+
+```
+lan-chat/
+├── main.go              # Wails 桌面端入口
+├── app.go               # Wails App 绑定
+├── godsend/             # 核心库包（可被 mobile 绑定）
+│   ├── config.go        # 配置管理
+│   ├── discovery.go     # 设备发现（UDP + mDNS）
+│   ├── network.go       # QUIC 网络通信
+│   ├── api.go           # HTTP/WebSocket API
+│   ├── message.go       # 消息类型定义
+│   ├── ui.go            # 前端 HTML 嵌入
+│   └── ui/index.html    # Web 前端
+├── mobile/              # Android 绑定包（gomobile bind）
+│   └── mobile.go
+├── frontend/            # Wails 前端资源
+└── build/               # 构建资源（图标等）
+```
+
 ## 快速开始
 
 ### 前置要求
@@ -54,7 +74,7 @@ wails build
 ```bash
 cd lan-chat
 docker run --rm -v "$(pwd):/work" -w /work \
-  makeworld/gomobile-android bind -target android -o god-send.aar ./...
+  makeworld/gomobile-android bind -target android -o god-send.aar ./mobile
 ```
 
 ## 使用

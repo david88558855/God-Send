@@ -1,4 +1,4 @@
-package main
+package godsend
 
 import (
 	"encoding/json"

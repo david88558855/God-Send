@@ -1,4 +1,4 @@
-package main
+package godsend
 
 import (
 	"context"
@@ -21,14 +21,14 @@ import (
 	"github.com/quic-go/quic-go"
 )
 
-// pendingFile 待完成的文件传输信息
-type pendingFile struct {
-	fileName      string
-	fileSize      int64
-	fromID        string
-	fromName      string
-	toID          string
-	receivedBytes int64 // 已接收字节数
+// PendingFile 待完成的文件传输信息
+type PendingFile struct {
+	FileName      string
+	FileSize      int64
+	FromID        string
+	FromName      string
+	ToID          string
+	ReceivedBytes int64 // 已接收字节数
 }
 
 // Network QUIC网络管理
@@ -38,10 +38,10 @@ type Network struct {
 	discovery    *Discovery
 	listener     *quic.Listener
 	connections  map[string]*quic.Conn // deviceID -> connection
-	pendingFiles map[string]*pendingFile // fileID -> 文件传输信息
+	pendingFiles map[string]*PendingFile // fileID -> 文件传输信息
 	onMessage    func(*Message)
 	onFileProgress func(fileID string, received int64, total int64)
-	onFileComplete func(fileID string, pf *pendingFile, finalPath string)
+	onFileComplete func(fileID string, pf *PendingFile, finalPath string)
 	stopCh       chan struct{}
 	tlsConfig    *tls.Config
 }
@@ -52,7 +52,7 @@ func NewNetwork(cfg *Config, disc *Discovery) *Network {
 		config:       cfg,
 		discovery:    disc,
 		connections:  make(map[string]*quic.Conn),
-		pendingFiles: make(map[string]*pendingFile),
+		pendingFiles: make(map[string]*PendingFile),
 		stopCh:       make(chan struct{}),
 	}
 }
@@ -68,7 +68,7 @@ func (n *Network) SetOnFileProgress(fn func(string, int64, int64)) {
 }
 
 // SetOnFileComplete 设置文件完成回调
-func (n *Network) SetOnFileComplete(fn func(string, *pendingFile, string)) {
+func (n *Network) SetOnFileComplete(fn func(string, *PendingFile, string)) {
 	n.onFileComplete = fn
 }
 
@@ -187,12 +187,12 @@ func (n *Network) handleStream(stream *quic.Stream, conn *quic.Conn) {
 	if msg.Type == MsgFileOffer {
 		// 存储文件传输信息，用于完成时重命名
 		n.mu.Lock()
-		n.pendingFiles[msg.FileID] = &pendingFile{
-			fileName: msg.Content,
-			fileSize: msg.FileSize,
-			fromID:   msg.From,
-			fromName: msg.FromName,
-			toID:     msg.To,
+		n.pendingFiles[msg.FileID] = &PendingFile{
+			FileName: msg.Content,
+			FileSize: msg.FileSize,
+			FromID:   msg.From,
+			FromName: msg.FromName,
+			ToID:     msg.To,
 		}
 		n.mu.Unlock()
 	}
@@ -327,12 +327,12 @@ func (n *Network) handleFileData(msg *Message) {
 	n.mu.Lock()
 	pf, exists := n.pendingFiles[msg.FileID]
 	if exists {
-		pf.receivedBytes += int64(len(msg.Data))
+		pf.ReceivedBytes += int64(len(msg.Data))
 	}
 	n.mu.Unlock()
 
 	if n.onFileProgress != nil && exists {
-		n.onFileProgress(msg.FileID, pf.receivedBytes, pf.fileSize)
+		n.onFileProgress(msg.FileID, pf.ReceivedBytes, pf.FileSize)
 	}
 }
 
@@ -350,11 +350,11 @@ func (n *Network) handleFileDone(msg *Message) {
 	tmpPath := filepath.Join(savePath, ".tmp_"+msg.FileID)
 	finalPath := ""
 
-	if exists && pf.fileName != "" {
+	if exists && pf.FileName != "" {
 		// 重命名临时文件为实际文件名
-		finalPath = filepath.Join(savePath, pf.fileName)
+		finalPath = filepath.Join(savePath, pf.FileName)
 		// 如果目标文件已存在，添加序号
-		baseName := pf.fileName
+		baseName := pf.FileName
 		ext := filepath.Ext(baseName)
 		nameNoExt := baseName[:len(baseName)-len(ext)]
 		counter := 1
@@ -380,7 +380,7 @@ func (n *Network) handleFileDone(msg *Message) {
 }
 
 // GetPendingFile 获取待完成文件信息
-func (n *Network) GetPendingFile(fileID string) *pendingFile {
+func (n *Network) GetPendingFile(fileID string) *PendingFile {
 	n.mu.RLock()
 	defer n.mu.RUnlock()
 	return n.pendingFiles[fileID]

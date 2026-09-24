@@ -52,7 +52,7 @@ jobs:
           docker run --rm \
             -v "$(pwd):/work" \
             -w /work \
-            makeworld/gomobile-android bind -target android -o god-send.aar ./...
+            makeworld/gomobile-android bind -target android -o god-send.aar ./mobile
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
