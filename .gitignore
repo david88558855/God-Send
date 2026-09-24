@@ -1,48 +1,23 @@
-# 构建产物
-build/
-/dist/
-bin/
+# Binaries
 *.exe
+*.exe~
 *.dll
 *.so
 *.dylib
-*.aar
 *.apk
 
-# Go
-*.o
-*.a
-*.test
-*.out
-vendor/
-
-# Wails
-frontend/node_modules/
-frontend/dist/*.map
+# Build output
+build/bin/
 
 # IDE
 .idea/
 .vscode/
-.joycode/
 *.swp
 *.swo
-*~
 
 # OS
-.DS_Store
 Thumbs.db
-desktop.ini
+.DS_Store
 
-# 临时文件
-*.log
-*.tmp
-.env
-.env.local
-
-# Android SDK工具（非项目源码）
-cmdline-tools/
-cmdline-tools.zip
-
-# 传输目录
-transfers/
-thumbnails/
+# Go
+vendor/

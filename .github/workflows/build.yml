@@ -1,4 +1,4 @@
-name: Build God-Send
+name: Build
 
 on:
   push:
@@ -6,13 +6,9 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  GO_VERSION: '1.27'
-  NODE_VERSION: '20'
-
 jobs:
-  # Windows x64 便携版构建
   build-windows:
+    name: Build Windows x64
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -21,30 +17,25 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+          go-version: '1.27'
 
       - name: Install Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-      - name: Download Dependencies
-        run: go mod download
+      - name: Build
+        working-directory: .
+        env:
+          CGO_ENABLED: 1
+        run: wails build
 
-      - name: Build Wails App (Portable)
-        run: wails build -clean -s -skipbindings
-
-      - name: Upload Windows Artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: God-Send-windows-x64
+          name: God-Send-win-x64
           path: build/bin/God-Send.exe
 
-  # Android ARM64 构建
   build-android:
+    name: Build Android
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,38 +44,18 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version: '1.27'
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: 17
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android NDK & Platform
+      - name: Build AAR with gomobile-android
+        working-directory: .
         run: |
-          sdkmanager --install "platforms;android-34"
-          sdkmanager --install "build-tools;34.0.0"
-          sdkmanager --install "ndk;26.1.10909125"
+          docker run --rm \
+            -v "$(pwd):/work" \
+            -w /work \
+            makeworld/gomobile-android bind -target android -o god-send.aar ./...
 
-      - name: Install gomobile
-        run: |
-          go install golang.org/x/mobile/cmd/gomobile@latest
-          gomobile init
-
-      - name: Download Dependencies
-        run: go mod download
-
-      - name: Build Android AAR
-        run: |
-          mkdir -p build
-          gomobile bind -target=android/arm64 -o build/God-Send.aar ./cmd/android
-
-      - name: Upload Android Artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: God-Send-android-arm64
-          path: build/God-Send.aar
+          name: God-Send-android
+          path: god-send.aar

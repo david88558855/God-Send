@@ -3,144 +3,151 @@ package main
 import (
 	"context"
 	"embed"
-	"encoding/json"
 	"fmt"
 	"log"
-
-	"github.com/God-Send/God-Send/internal/config"
-	"github.com/God-Send/God-Send/internal/discovery"
-	"github.com/God-Send/God-Send/internal/protocol"
-	"github.com/God-Send/God-Send/internal/server"
-	"github.com/God-Send/God-Send/internal/transfer"
+	"os"
+	"os/exec"
+	"os/signal"
+	"syscall"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
-//go:embed all:frontend/dist
-var assets embed.FS
+//go:embed frontend/dist
+var frontendDist embed.FS
+
+// 全局配置（供app.go使用）
+var appConfig *Config
+
+// addFirewallRule 添加Windows防火墙入站规则（允许指定端口的连接）
+func addFirewallRule(name string, protocol string, port int) {
+	cmd := exec.Command("netsh", "advfirewall", "firewall", "add", "rule",
+		"name="+name, "dir=in", "action=allow", "protocol="+protocol,
+		fmt.Sprintf("localport=%d", port), "profile=any")
+	// 隐藏子进程窗口，避免黑框闪现
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow:    true,
+		CreationFlags: 0x08000000, // CREATE_NO_WINDOW
+	}
+	if err := cmd.Run(); err != nil {
+		log.Printf("[主程序] 添加防火墙规则失败(%s %s %d): %v，可能需要管理员权限", name, protocol, port, err)
+	} else {
+		log.Printf("[主程序] 已添加防火墙规则: %s (%s %d)", name, protocol, port)
+	}
+}
 
 func main() {
-	cfg := config.DefaultConfig()
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	log.Println("[主程序] God-Send 启动中...")
 
-	if err := cfg.EnsureDirs(); err != nil {
-		log.Fatalf("初始化目录失败: %v", err)
+	// 加载配置
+	cfg := LoadConfig()
+	appConfig = cfg
+	log.Printf("[主程序] 设备: %s (%s), QUIC端口: %d", cfg.GetDeviceName(), cfg.GetDeviceID(), cfg.GetPort())
+
+	// 添加Windows防火墙规则，允许局域网设备连接
+	addFirewallRule("GodSend-HTTP", "TCP", cfg.HTTPPort)
+	addFirewallRule("GodSend-QUIC", "UDP", cfg.GetPort())
+	addFirewallRule("GodSend-Discovery", "UDP", cfg.HTTPPort)
+
+	// 确保文件保存目录存在
+	savePath := cfg.GetSavePath()
+	if err := os.MkdirAll(savePath, 0755); err != nil {
+		log.Printf("[主程序] 创建保存目录失败: %v", err)
 	}
 
-	disc := discovery.New(cfg)
-	mgr := transfer.NewManager(cfg)
-	srv := server.New(cfg, disc, mgr)
+	// 创建设备发现服务
+	disc := NewDiscovery(cfg)
 
-	disc.SetCallbacks(
-		func(peer *protocol.DeviceInfo) {
-			log.Printf("[发现] 设备上线: %s", peer.Name)
-		},
-		func(id string) {
-			log.Printf("[发现] 设备离线: %s", id)
-		},
-	)
+	// 创建网络服务
+	net := NewNetwork(cfg, disc)
 
+	// 创建API服务
+	api := NewAPI(cfg, disc, net)
+
+	// 设置回调：网络消息 -> API处理
+	net.SetOnMessage(func(msg *Message) {
+		api.OnIncomingMessage(msg)
+	})
+
+	// 设置回调：文件传输完成 -> API处理
+	net.SetOnFileComplete(func(fileID string, pf *pendingFile, finalPath string) {
+		api.OnFileComplete(fileID, pf, finalPath)
+	})
+
+	// 设置回调：文件传输进度 -> API广播
+	net.SetOnFileProgress(func(fileID string, received int64, total int64) {
+		api.OnFileProgress(fileID, received, total)
+	})
+
+	// 设置回调：设备变化 -> 通知前端
+	disc.SetOnDeviceChange(func() {
+		api.OnDevicesChanged()
+	})
+
+	// 启动设备发现
 	if err := disc.Start(); err != nil {
-		log.Printf("警告: 设备发现启动失败: %v", err)
+		log.Fatalf("[主程序] 设备发现启动失败: %v", err)
 	}
 
+	// 启动QUIC网络
+	if err := net.Start(); err != nil {
+		log.Fatalf("[主程序] QUIC网络启动失败: %v", err)
+	}
+
+	// 启动HTTP API（为浏览器客户端提供服务）
+	if err := api.Start(); err != nil {
+		log.Fatalf("[主程序] API服务启动失败: %v", err)
+	}
+
+	log.Printf("[主程序] HTTP服务已启动，局域网设备可通过浏览器访问 http://<本机IP>:%d", cfg.HTTPPort)
+
+	// 获取HTTP handler用于Wails AssetServer
+	httpHandler := api.GetHandler()
+
+	// 创建Wails应用
+	app := NewApp()
+
+	// 在单独的goroutine中等待退出信号
 	go func() {
-		if err := srv.Start(); err != nil {
-			log.Printf("服务器启动失败: %v", err)
-		}
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+		<-sigCh
+		log.Println("[主程序] 收到退出信号，正在关闭...")
 	}()
 
-	app := &App{
-		config:    cfg,
-		discovery: disc,
-		server:    srv,
-		transfer:  mgr,
-	}
-
-	if err := wails.Run(&options.App{
+	// 运行Wails应用
+	err := wails.Run(&options.App{
 		Title:     "God-Send",
-		Width:     1024,
-		Height:    768,
-		MinWidth:  768,
-		MinHeight: 540,
+		Width:     1200,
+		Height:    800,
+		MinWidth:  800,
+		MinHeight: 600,
 		AssetServer: &assetserver.Options{
-			Assets: assets,
+			Handler: httpHandler,
 		},
-		BackgroundColour: &options.RGBA{R: 245, G: 245, B: 245, A: 255},
 		OnStartup:  app.startup,
-		OnShutdown: app.shutdown,
+		OnShutdown: func(ctx context.Context) {
+			log.Println("[主程序] 正在关闭...")
+			api.Stop()
+			net.Stop()
+			disc.Stop()
+			log.Println("[主程序] 已关闭")
+		},
+		Windows: &windows.Options{
+			WebviewIsTransparent: false,
+			WindowIsTranslucent:  false,
+			DisableWindowIcon:    false,
+		},
 		Bind: []interface{}{
 			app,
 		},
-	}); err != nil {
-		log.Fatalf("Wails启动失败: %v", err)
-	}
-}
-
-// App Wails应用绑定
-type App struct {
-	ctx       context.Context
-	config    *config.Config
-	discovery *discovery.Discovery
-	server    *server.Server
-	transfer  *transfer.Manager
-}
-
-func (a *App) startup(ctx context.Context) {
-	a.ctx = ctx
-	log.Println("God-Send desktop app started")
-}
-
-func (a *App) shutdown(ctx context.Context) {
-	log.Println("God-Send desktop app shutting down...")
-	a.server.Stop()
-	a.discovery.Stop()
-}
-
-// GetDeviceInfo 返回设备信息
-func (a *App) GetDeviceInfo() map[string]interface{} {
-	return map[string]interface{}{
-		"device_name": a.config.DeviceName,
-		"device_id":   a.discovery.GetDeviceID(),
-		"port":        a.config.Port,
-		"platform":    "windows",
-		"color":       a.config.AvatarColor,
-		"download_dir": a.config.DownloadDir,
-	}
-}
-
-// GetServerURL 返回本地服务器URL
-func (a *App) GetServerURL() string {
-	return fmt.Sprintf("http://127.0.0.1:%d", a.config.Port)
-}
-
-// GetPeers 返回已发现的设备列表
-func (a *App) GetPeers() string {
-	peers := a.discovery.GetPeers()
-	data, _ := json.Marshal(peers)
-	return string(data)
-}
-
-// GetTransfers 返回传输列表
-func (a *App) GetTransfers() string {
-	transfers := a.transfer.GetTransfers()
-	data, _ := json.Marshal(transfers)
-	return string(data)
-}
-
-// SetDeviceName 设置设备名称
-func (a *App) SetDeviceName(name string) {
-	a.config.DeviceName = name
-}
-
-// GetConfig 返回配置信息
-func (a *App) GetConfig() string {
-	data, _ := json.Marshal(map[string]interface{}{
-		"device_name":  a.config.DeviceName,
-		"port":         a.config.Port,
-		"download_dir": a.config.DownloadDir,
-		"color":        a.config.AvatarColor,
 	})
-	return string(data)
+
+	if err != nil {
+		log.Fatalf("[主程序] Wails启动失败: %v", err)
+	}
 }

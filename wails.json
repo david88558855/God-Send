@@ -2,11 +2,18 @@
   "$schema": "https://wails.io/schemas/config.v2.json",
   "name": "God-Send",
   "outputfilename": "God-Send",
-  "frontend:install": "npm install",
-  "frontend:build": "npm run build",
-  "frontend:dev:watcher": "npm run dev",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
   "frontend:dev:serverUrl": "auto",
   "author": {
     "name": "God-Send"
+  },
+  "info": {
+    "companyName": "God-Send",
+    "productName": "God-Send",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2026",
+    "comments": "God-Send - 局域网聊天工具"
   }
 }

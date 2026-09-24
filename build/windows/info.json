@@ -1,0 +1,28 @@
+{
+  "fixedFileInfo": {
+    "fileVersion": "1.0.0.0",
+    "productVersion": "1.0.0.0",
+    "fileFlagsMask": "3f",
+    "fileFlags": "00",
+    "fileOS": "04004",
+    "fileType": "01",
+    "fileSubType": "00"
+  },
+  "stringFileInfo": {
+    "comments": "God-Send - 局域网聊天工具",
+    "companyName": "God-Send",
+    "fileDescription": "God-Send",
+    "fileVersion": "1.0.0.0",
+    "internalName": "God-Send",
+    "legalCopyright": "Copyright © 2026",
+    "originalFilename": "God-Send.exe",
+    "productName": "God-Send",
+    "productVersion": "1.0.0.0"
+  },
+  "varFileInfo": {
+    "translation": {
+      "langID": "0409",
+      "charsetID": "04B0"
+    }
+  }
+}
